@@ -1,0 +1,126 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Dec  9 09:19:37 2016
+
+@author: jstrobel
+"""
+
+import sys
+import os
+import atexit
+import ftplib
+import errno
+import tarfile
+
+def cleanup():
+    pass
+
+
+def download_file(line):
+	 
+	# Connection to FTP - Server
+	ftp = ftplib.FTP('ftp.eorc.jaxa.jp')
+	ftp.login('','')
+	directory = '/pub/ALOS/ext1/AW3D30/v1604/'
+	ftp.cwd(directory)
+	
+	directory_local = '/home/jstrobel/Dokumente/Jaxa_Daten'
+ 
+      # split the String, take column 8
+	strings = line.split()
+	filename = strings[8]
+	
+	try:
+		idx = filename.index('.tar.gz')
+		print 'Treffer fuer ' + filename
+	
+		# Change directory to local
+		os.chdir(directory_local)
+		
+		# Download 
+		print 'Download der Datei ' + filename + '...'
+		
+            # write the needed files back local
+		ftp.retrbinary('RETR ' + filename, open(filename, 'wb').write)
+		
+		print 'Downloaded ' + filename
+		print ' ' 
+		
+	except ValueError:
+		
+		return 'kein Treffer fuer ' + filename
+		print ' '
+		
+
+
+
+def extract():
+	
+	#extracting datas	
+	directory_local = '/home/jstrobel/Dokumente/Jaxa_Daten'
+	os.chdir(directory_local)
+	print 'extracting datas'
+	
+	dirs = os.listdir(directory_local)
+ 
+      # for every filename in chosen directory
+	for filename in dirs:
+		try:
+                  # get all files with .tar.gz extension
+			idx = filename.index('.tar.gz')
+			print 'opening tar files' + filename
+			t = tarfile.open(filename, 'r:gz')
+                  # for every matching file 
+			for name in t.getnames():
+				try:
+                               # get files with DSM.tif extension
+					idx = name.index('DSM.tif')
+					print 'extract data' + name 
+                               # extract them to new directory 
+					t.extractall('/home/jstrobel/Dokumente/Jaxa_Daten/extracted_data', members=[t.getmember(name)])
+		
+				except ValueError:
+					print ' '
+				
+		except ValueError:
+			print ' '
+	print 'All files extracted'
+        
+def main():
+	
+	#create directory, if not exists in ~/Dokumente
+	if not os.path.exists('/home/jstrobel/Dokumente/Jaxa_Daten'):
+		os.makedirs('/home/jstrobel/Dokumente/Jaxa_Daten')
+	print 'Verzeichnis /Jaxa_Daten erstellt'
+	
+	
+	#access to FTP-Server
+	ftp = ftplib.FTP('ftp.eorc.jaxa.jp')
+	ftp.login('','')
+	directory = '/pub/ALOS/ext1/AW3D30/v1604/'
+	ftp.cwd(directory)
+	
+	#download datas
+	print 'Liste Daten auf...'
+	print ' '
+	ftp.retrlines('LIST', download_file)
+
+	#quit from server
+	ftp.quit()
+	
+	#create directory, if not exists
+	new_directory = '/home/jstrobel/Dokumente/Jaxa_Daten/extracted_data/'
+	if not os.path.exists('/home/jstrobel/Dokumente/Jaxa_Daten/extracted_data/'):
+		os.mkdir('/home/jstrobel/Dokumente/Jaxa_Daten/extracted_data/')
+		print 'created directory ' + new_directory
+	else:
+		print 'Directory already exists'
+	
+	#extracting of DSM.tif-datas
+	extract()	
+	
+	
+if __name__ == "__main__":
+  # options, flags = parser()
+    atexit.register(cleanup)
+    sys.exit(main())
