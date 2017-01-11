@@ -2,7 +2,7 @@
 ############################################################################
 #
 # MODULE:       i.in.probav
-# AUTHOR(S):    jstrobel
+# AUTHOR(S):    jstrobel intern at mundialis and terrestris, Bonn
 # PURPOSE:      i.in.probav
 # COPYRIGHT:    (C) 2016 by stjo, and the GRASS Development Team
 #
