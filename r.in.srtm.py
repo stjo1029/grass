@@ -6,7 +6,7 @@
 # AUTHOR(S): Markus Neteler 11/2003 neteler AT itc it
 #            Hamish Bowman
 #            Glynn Clements
-#            Jonas Strobel
+#            Jonas Strobel intern at mundialis and terrestris, Bonn
 # PURPOSE:   import of SRTM hgt files or SRTM SWBD raw files into GRASS
 #
 # COPYRIGHT:    (C) 2004-2017 by the GRASS Development Team
